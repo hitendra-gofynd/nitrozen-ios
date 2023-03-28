@@ -9,65 +9,83 @@ import SwiftUI
 
 public class FontProvider {
 	
-	//MARK: public properties
-	public var headingXS: SystemFont
-	public var headingXXS: SystemFont
+	public enum ContextTag {
+		case heading, subheading, body, label
+	}
 	
-	public var subHeadingS: SystemFont
-	public var bodyXS: SystemFont
-	public var labelXXS: SystemFont
+	public enum Variant: Hashable {
+		case xxs, xs, s, m, l, xl, xxl
+	}
+	
+	public enum Weight: Hashable {
+		case ultrathin, thin, light, regular, medium, semibold, bold, heavy, black
+	}
+	
+	public struct ContextVariantProvider: Hashable {
+		var context: ContextTag
+		var variant: Variant
+	}
+	
+	public typealias SizeMapper = [ContextVariantProvider : CGFloat]
+	var sizeMapper: SizeMapper
+	
+	public struct FileNameProvider {
+		public var ultrathin: String
+		public var thin: String
+		public var light: String
+		public var regular: String
+		public var medium: String
+		public var semibold: String
+		public var bold: String
+		public var heavy: String
+		public var black: String
+	}
+	
+	//MARK: public properties
+	public var fileNames: FileNameProvider
 	
 	//MARK: Init
 	init(
-		headingXS: SystemFont, headingXXS: SystemFont,
-		subHeadingS: SystemFont,
-		bodyXS: SystemFont,
-		labelXXS: SystemFont
+		fileNames: FileNameProvider,
+		sizeMapper: [ContextVariantProvider : CGFloat]
 	) {
-		self.headingXS = headingXS
-		self.headingXXS = headingXXS
-		self.subHeadingS = subHeadingS
-		self.bodyXS = bodyXS
-		self.labelXXS = labelXXS
+		self.fileNames = fileNames
+		self.sizeMapper = sizeMapper
 	}
 }
 
 public extension FontProvider {
 	//MARK: Public Shared
 	static var shared: FontProvider = {
-		.init(headingXS: .largeTitle.weight(.bold), headingXXS: .title.weight(.bold),
-			  subHeadingS: .title.weight(.medium), bodyXS: .body.weight(.regular),
-			  labelXXS: .callout.weight(.regular))
+		.init(
+			fileNames: .init(ultrathin: "", thin: "", light: "", regular: "", medium: "", semibold: "", bold: "", heavy: "", black: ""),
+			sizeMapper: [:]
+		)
 	}()
 }
+
 
 //MARK: Property updaters
 public extension FontProvider {
 	@discardableResult
-	func headingXS(_ headingXS: SystemFont) -> Self { self.headingXS = headingXS; return self }
+	func fileNames(_ fileNames: FileNameProvider) -> Self { self.fileNames = fileNames; return self }
 	
 	@discardableResult
-	func headingXXS(_ headingXXS: SystemFont) -> Self { self.headingXXS = headingXXS; return self }
+	func sizeMapperReplacingOld(_ sizeMapper: SizeMapper) -> Self { self.sizeMapper = sizeMapper; return self }
 	
 	@discardableResult
-	func subHeadingS(_ subHeadingS: SystemFont) -> Self { self.subHeadingS = subHeadingS; return self }
-	
-	@discardableResult
-	func bodyXS(_ bodyXS: SystemFont) -> Self { self.bodyXS = bodyXS; return self }
-	
-	@discardableResult
-	func labelXXS(_ labelXXS: SystemFont) -> Self { self.labelXXS = labelXXS; return self }
+	func sizeMapperUpdatingOld(_ sizeMapper: SizeMapper) -> Self {
+		sizeMapper.forEach { key, value in
+			self.sizeMapper[key] = value //updating self sizeMapper
+		}
+		return self
+	}
 }
+
 
 //MARK: Copy Support
 public extension FontProvider {
 	var copy: FontProvider {
-		FontProvider(
-			headingXS: self.headingXS,
-			headingXXS: self.headingXXS,
-			subHeadingS: self.subHeadingS,
-			bodyXS: self.bodyXS,
-			labelXXS: self.labelXXS
-		)
+		FontProvider(fileNames: self.fileNames, sizeMapper: self.sizeMapper)
 	}
 }

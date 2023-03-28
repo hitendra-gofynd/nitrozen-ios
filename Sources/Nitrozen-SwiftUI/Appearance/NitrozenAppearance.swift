@@ -62,7 +62,7 @@ public extension NitrozenAppearance {
 		let disableOpacity: Double = 0.3
 		
 		
-		let font: SystemFont = fontProvider.headingXS
+		let font: SystemFont = .system(.body)
 		
 		return .init(
 			colorProvider: ColorProvider.shared,
@@ -71,7 +71,7 @@ public extension NitrozenAppearance {
 			primaryButton: .init(styleUseCase: .primary,
 								 titleColor: .white, titleColorDisabled: .white.opacity(disableOpacity),
 								 backgroundColor: colorProvider.primary, backgroundColorDisabled: colorProvider.primary.opacity(disableOpacity),
-								 font: font, borderWidth: 0.0),
+								 font: .system(.bo), borderWidth: 0.0),
 			
 			borderedButton: .init(styleUseCase: .bordered,
 								  titleColor: colorProvider.primary, titleColorDisabled: colorProvider.primary.opacity(disableOpacity),
